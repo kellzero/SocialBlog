@@ -5,12 +5,14 @@ from product.factories import ProductFactory
 
 from order.models import Order
 
+
 class UserFactory(factory.django.DjangoModelFactory):
     email = factory.Faker("pystring")
     username = factory.Faker("pystring")
 
     class Meta:
         model = User
+
 
 class OrderFactory(factory.django.DjangoModelFactory):
     user = factory.SubFactory(UserFactory)

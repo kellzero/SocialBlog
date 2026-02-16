@@ -9,7 +9,7 @@ def test_product_serializer():
         "description": "Testando o serializer",
         "price": 999,
         "activate": True,
-        "category": []  # Adicione category como lista vazia
+        "category": [],  # Adicione category como lista vazia
     }
 
     serializer = ProductSerializer(data=data)

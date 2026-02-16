@@ -26,13 +26,13 @@ from product.views import ProductViewSet
 
 # Crie o router
 router = DefaultRouter()
-router.register(r'products', ProductViewSet, basename='product')
+router.register(r"products", ProductViewSet, basename="product")
 
 urlpatterns = [
     path("__debug__/", include(debug_toolbar.urls)),
-    path('admin/', admin.site.urls),
-    path('api/', include(router.urls)),  # Inclui todas as URLs da API
-    path('api-auth/', include('rest_framework.urls')),  # Para autenticação da API
+    path("admin/", admin.site.urls),
+    path("api/", include(router.urls)),  # Inclui todas as URLs da API
+    path("api-auth/", include("rest_framework.urls")),  # Para autenticação da API
     re_path("bookstore/(?P<version>(v1|v2))/", include("order.urls")),
     re_path("bookstore/(?P<version>(v1|v2))/", include("product.urls")),
 ]

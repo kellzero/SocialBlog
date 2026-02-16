@@ -5,21 +5,27 @@ from product.serializers.category_serializer import CategorySerializer
 
 class ProductSerializer(serializers.ModelSerializer):
     category = CategorySerializer(read_only=True, many=True)
-    categories_id = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all(), write_only=True, many=True,)
+    categories_id = serializers.PrimaryKeyRelatedField(
+        queryset=Category.objects.all(),
+        write_only=True,
+        many=True,
+    )
 
     class Meta:  # This should be INSIDE the ProductSerializer class
         model = Product
         fields = [
-            'id',
-            'title',
-            'description',
-            'price',
-            'activate',
-            'category',
-            'categories_id',
+            "id",
+            "title",
+            "description",
+            "price",
+            "activate",
+            "category",
+            "categories_id",
         ]
 
-    def create(self, validated_data):  # This should also be INSIDE the ProductSerializer class
+    def create(
+        self, validated_data
+    ):  # This should also be INSIDE the ProductSerializer class
         category_data = validated_data.pop("categories_id")
 
         product = Product.objects.create(**validated_data)

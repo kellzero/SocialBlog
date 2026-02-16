@@ -8,7 +8,7 @@ def test_create_product():
         title="Titulo teste do produto",
         description="Descrição de teste",
         price=999,
-        activate=True
+        activate=True,
     )
 
     assert product.id is not None
