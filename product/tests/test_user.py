@@ -9,7 +9,7 @@ def test_create_user():
         email="dark.killa@bol.com.br",
         password="ilovekittens@777",
         first_name="Oscar",
-        last_name="Alho"
+        last_name="Alho",
     )
 
     # If you have a UserProfile model with additional fields, create it separately
