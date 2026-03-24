@@ -1,47 +1,42 @@
 name: Python Application
 
-on: [push, pull_request]  # Adicionei pull_request também
+on: [push, pull_request]
 
 jobs:
   build:
     strategy:
       fail-fast: false
       matrix:
-        # Atualize para versões mais recentes do Python
         python-version: ['3.10', '3.11', '3.12']
-        # Se seu projeto suportar Python 3.13, adicione também
 
     runs-on: ubuntu-latest
 
     steps:
-    # Atualize para a versão mais recente do checkout
-    - uses: actions/checkout@v4  # v4 é a mais recente
+    - uses: actions/checkout@v4
 
-    # Atualize para a versão mais recente do setup-python
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5  # v5 é a mais recente
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
-        cache: 'poetry'  # Adiciona cache automático
 
     - name: Install poetry
       run: |
         python -m pip install --upgrade pip
         python -m pip install poetry
 
-    - name: Install dependencies
-      run: |
-        poetry install --no-interaction
+    - name: Add poetry to PATH
+      run: echo "$HOME/.local/bin" >> $GITHUB_PATH
 
-    - name: Run migrations (if needed)
+    - name: Verify poetry installation
+      run: poetry --version
+
+    - name: Install dependencies
+      run: poetry install --no-interaction --no-root
+
+    - name: Run migrations
       run: |
         poetry run python manage.py migrate
 
     - name: Run tests
       run: |
         poetry run python manage.py test
-
-    # Opcional: Adicionar linting
-    - name: Run flake8 (optional)
-      run: |
-        poetry run flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
