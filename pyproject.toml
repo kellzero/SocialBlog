@@ -30,4 +30,3 @@ url = "https://pypi.org/simple/"
 priority = "supplemental"
 
 
-package-mode = false
