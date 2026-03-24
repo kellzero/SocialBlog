@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "Bookstore API"
 authors = ["kelvin <kellzer01@gmail.com>"]
 readme = "README.md"
+package-mode = false
 
 [tool.poetry.dependencies]
 python = ">=3.10"
@@ -28,5 +29,5 @@ name = "pypi-ssl"
 url = "https://pypi.org/simple/"
 priority = "supplemental"
 
-[tool.poetry]
+
 package-mode = false
