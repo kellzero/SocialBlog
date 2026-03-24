@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "projetobookstore"
+name = "bookstore"
 version = "0.1.0"
 description = "Bookstore API"
 authors = ["kelvin <kellzer01@gmail.com>"]
@@ -27,3 +27,6 @@ build-backend = "poetry.core.masonry.api"
 name = "pypi-ssl"
 url = "https://pypi.org/simple/"
 priority = "supplemental"
+
+[tool.poetry]
+package-mode = false
