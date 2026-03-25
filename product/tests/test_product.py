@@ -1,4 +1,5 @@
 import pytest
+
 from product.models import Product
 
 
@@ -15,4 +16,4 @@ def test_create_product():
     assert product.title == "Titulo teste do produto"
     assert product.description == "Descrição de teste"
     assert product.price == 999
-    assert product.activate == True
+    assert product.activate is True
