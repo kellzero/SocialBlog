@@ -5,32 +5,32 @@ jobs:
   qa:
     name: Quality check
     runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        python-version: ['3.8', '3.9', '3.10']  # Testa múltiplas versões
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v4
       - name: Set up Python
-        uses: actions/setup-python@master
+        uses: actions/setup-python@v5
         with:
-          python-version: 3.8
+          python-version: ${{ matrix.python-version }}
+
       - name: Install poetry
         run: |
           pip install -U pip
           pip install poetry
-          poetry install
-        env:
-          POETRY_VIRTUALENVS_CREATE: false
-
-      - name: View poetry --help
-        run: poetry --help
 
       - name: Install dependencies
-        shell: bash
-        run: python -m poetry install
+        run: |
+          poetry config virtualenvs.create false
+          poetry install
 
-      - name: Test
+      - name: Run tests
         run: |
           poetry run python manage.py test
-      - name: Wemake Python Stylguide
-        uses: wemake-services/wemake-python-styleguide@0.16.0
+
+      - name: Wemake Python Styleguide
+        uses: wemake-services/wemake-python-styleguide@0.19.0
         continue-on-error: true
         with:
           reporter: 'github-pr-review'
