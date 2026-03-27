@@ -25,6 +25,8 @@ jobs:
       - name: Run tests
         run: |
           poetry run python manage.py test
+        env:
+          DJANGO_SECRET_KEY: 'django-insecure-test-key-1234567890!@#$%^&*()'
 
       - name: Wemake Python Styleguide
         uses: wemake-services/wemake-python-styleguide@0.19.0
