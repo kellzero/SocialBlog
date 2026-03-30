@@ -1,10 +1,9 @@
-import json
 from django.test import TestCase
 from django.urls import reverse
-from rest_framework.test import APIClient
 from rest_framework import status
+from rest_framework.test import APIClient
 
-from product.factories import ProductFactory, CategoryFactory
+from product.factories import CategoryFactory, ProductFactory
 from product.models import Product
 
 
@@ -35,9 +34,7 @@ class TestProductViewSet(TestCase):
             "categories_id": [category.id],
         }
 
-        response = self.client.post(
-            reverse("product-list", kwargs={"version": "v1"}), data=data, format="json"
-        )
+        response = self.client.post(reverse("product-list", kwargs={"version": "v1"}), data=data, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         created_product = Product.objects.get(title="notebook")

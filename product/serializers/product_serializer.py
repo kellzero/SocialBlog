@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from product.models.product import Product, Category
+
+from product.models.product import Category, Product
 from product.serializers.category_serializer import CategorySerializer
 
 
@@ -23,9 +24,7 @@ class ProductSerializer(serializers.ModelSerializer):
             "categories_id",
         ]
 
-    def create(
-        self, validated_data
-    ):  # This should also be INSIDE the ProductSerializer class
+    def create(self, validated_data):  # This should also be INSIDE the ProductSerializer class
         category_data = validated_data.pop("categories_id")
 
         product = Product.objects.create(**validated_data)

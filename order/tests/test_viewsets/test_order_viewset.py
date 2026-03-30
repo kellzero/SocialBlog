@@ -1,14 +1,12 @@
 import json
-
-from rest_framework import status
-from rest_framework.test import APITestCase, APIClient
-
+from rest_framework.authtoken.models import Token
 from django.urls import reverse
+from rest_framework import status
+from rest_framework.test import APIClient, APITestCase
 
-from product.factories import CategoryFactory, ProductFactory
-from order.factories import UserFactory, OrderFactory
-from product.models import Product
+from order.factories import OrderFactory, UserFactory
 from order.models import Order
+from product.factories import CategoryFactory, ProductFactory
 
 
 class TestOrderViewSet(APITestCase):
@@ -22,9 +20,7 @@ class TestOrderViewSet(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
 
         self.category = CategoryFactory(title="technology")
-        self.product = ProductFactory(
-            title="mouse", price=100, category=[self.category]
-        )
+        self.product = ProductFactory(title="mouse", price=100, category=[self.category])
         self.order = OrderFactory(product=[self.product])
 
         def test_get_all_orders(self):
@@ -37,9 +33,7 @@ class TestOrderViewSet(APITestCase):
             self.assertEqual(order_data["product"][0]["title"], self.product.title)
             self.assertEqual(order_data["product"][0]["price"], self.product.title)
             self.assertEqual(order_data["product"][0]["active"], self.product.title)
-            self.assertEqual(
-                order_data["product"][0]["category"][0]["title"], self.product.title
-            )
+            self.assertEqual(order_data["product"][0]["category"][0]["title"], self.product.title)
 
             def test_create_order_with_auth(self):
 

@@ -17,11 +17,9 @@ Including another URLconf
 
 import debug_toolbar
 from django.contrib import admin
-from django.urls import path
-
-from django.contrib import admin
-from django.urls import path, include, re_path
+from django.urls import include, path, re_path
 from rest_framework.routers import DefaultRouter
+
 from product.views import ProductViewSet
 
 # Crie o router

@@ -1,1 +1,3 @@
-from .order_serializers import OrderSerializer
+﻿from .order_serializers import OrderSerializer
+
+__all__ = ['OrderSerializer']

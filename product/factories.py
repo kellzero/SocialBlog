@@ -1,5 +1,6 @@
 import factory
-from product.models import Product, Category
+
+from product.models import Category, Product
 
 
 class CategoryFactory(factory.django.DjangoModelFactory):
@@ -17,9 +18,7 @@ class ProductFactory(factory.django.DjangoModelFactory):
 
     title = factory.Faker("word")
     description = factory.Faker("sentence")
-    price = factory.Faker(
-        "pyint", min_value=1, max_value=1000
-    )  # For PositiveBigIntegerField
+    price = factory.Faker("pyint", min_value=1, max_value=1000)  # For PositiveBigIntegerField
     activate = factory.Faker("boolean")  # Note: field name is 'activate', not 'active'
 
     @factory.post_generation

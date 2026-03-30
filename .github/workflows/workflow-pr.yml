@@ -1,0 +1,37 @@
+name: Python Pull Request Workflow
+on: [pull_request]
+jobs:
+
+  qa:
+    name: Quality check
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install poetry
+        run: |
+          pip install -U pip
+          pip install poetry
+
+      - name: Install dependencies
+        run: |
+          poetry config virtualenvs.create false
+          poetry install --no-interaction
+
+      - name: Run tests
+        run: |
+          poetry run python manage.py test --settings=settings_test
+        # Ajuste o caminho "bookstore.settings_test" conforme sua estrutura
+
+      - name: Wemake Python Styleguide
+        uses: wemake-services/wemake-python-styleguide@0.19.0
+        continue-on-error: true
+        with:
+          reporter: 'github-pr-review'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
