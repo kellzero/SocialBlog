@@ -16,6 +16,7 @@ Including another URLconf
 """
 
 import debug_toolbar
+from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path, re_path
 from rest_framework.routers import DefaultRouter
@@ -34,3 +35,11 @@ urlpatterns = [
     re_path("bookstore/(?P<version>(v1|v2))/", include("order.urls")),
     re_path("bookstore/(?P<version>(v1|v2))/", include("product.urls")),
 ]
+if settings.DEBUG and 'debug_toolbar' in settings.INSTALLED_APPS:
+    try:
+        import debug_toolbar
+        urlpatterns += [
+            path('__debug__/', include(debug_toolbar.urls)),
+        ]
+    except ImportError:
+        pass
