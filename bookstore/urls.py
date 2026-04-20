@@ -35,11 +35,12 @@ urlpatterns = [
     re_path("bookstore/(?P<version>(v1|v2))/", include("order.urls")),
     re_path("bookstore/(?P<version>(v1|v2))/", include("product.urls")),
 ]
-if settings.DEBUG and 'debug_toolbar' in settings.INSTALLED_APPS:
+if settings.DEBUG and hasattr(settings, 'INSTALLED_APPS'):
     try:
         import debug_toolbar
-        urlpatterns += [
-            path('__debug__/', include(debug_toolbar.urls)),
-        ]
+        if 'debug_toolbar' in settings.INSTALLED_APPS:
+            urlpatterns += [
+                path('__debug__/', include(debug_toolbar.urls)),
+            ]
     except ImportError:
         pass
