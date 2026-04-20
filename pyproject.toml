@@ -19,6 +19,7 @@ dj-config-url = "^0.1.1"
 dj-database-url = "^2.0"
 python-dotenv = "==1.0.0"
 gitpython = "^3.1.46"
+whitenoise = "^6.12.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=9.0.1,<10.0.0"
