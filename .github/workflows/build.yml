@@ -1,51 +1,37 @@
-name: Python Application
+name: Python application
 
-on: [push, pull_request]
+on: [push]
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
+  build:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.10', '3.11', '3.12', '3.13']
+        python-version: [3.8, 3.9]
+
+    runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4.3.0
+    - uses: actions/checkout@v2
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5.6.0
+      uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
-        cache: 'pip'
 
-    - name: Install Poetry
+    - name: Install poetry
       run: |
+        python -m ensurepip
         python -m pip install --upgrade pip
-        python -m pip install poetry
+        python -m pip install --upgrade poetry
+    - name: View poetry --help
+      run: poetry --help
 
-    - name: Install dependencies (without installing the project)
-      run: |
-        poetry install --no-interaction --no-root
+    - name: Install dependencies
+      shell: bash
+      run:
+        python -m poetry install
 
-    - name: Run migrations
-      env:
-        DJANGO_ALLOWED_HOSTS: "localhost 127.0.0.1"
-        DEBUG: "1"
-        SECRET_KEY: "django-insecure-test-key-123456"
+    - name: Test
       run: |
-        poetry run python manage.py migrate
-
-    - name: Run tests
-      env:
-        DJANGO_ALLOWED_HOSTS: "localhost 127.0.0.1"
-        DEBUG: "1"
-        SECRET_KEY: "django-insecure-test-key-123456"
-      run: |
-        poetry run python manage.py test --verbosity=2
-
-    - name: Run flake8 (optional)
-      run: |
-        poetry run flake8 . --count --show-source --statistics
-      continue-on-error: true
+        poetry run python manage.py test
