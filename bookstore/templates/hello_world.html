@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BookStore API - PythonAnywhere</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 { color: #333; }
+        .status { color: green; font-weight: bold; }
+        .date { color: #666; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 BookStore API</h1>
+        <p>Projeto rodando no <strong>PythonAnywhere</strong> com automação de deploy!</p>
+        <p class="status">✅ Servidor ativo</p>
+        <p class="date">Último deploy: {% now "d/m/Y H:i:s" %}</p>
+        <hr>
+        <h3>Endpoints disponíveis:</h3>
+        <ul>
+            <li><a href="/api/">/api/</a> - API de produtos</li>
+            <li><a href="/admin/">/admin/</a> - Admin Django</li>
+            <li><a href="/bookstore/v1/product/">/bookstore/v1/product/</a> - Lista de produtos</li>
+        </ul>
+    </div>
+</body>
+</html>
