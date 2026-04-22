@@ -23,6 +23,7 @@ urlpatterns = [
     path("api/", include(router.urls)),
     path("api-auth/", include("rest_framework.urls")),
     path('api/accounts/', include('accounts.urls')),
+    path('api/posts/', include('posts.urls')),
     re_path("bookstore/(?P<version>(v1|v2))/", include("order.urls")),
     re_path("bookstore/(?P<version>(v1|v2))/", include("product.urls")),
 ]
