@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SocialBlog - Login</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>📚 SocialBlog</h1>
+
+            <div class="tabs">
+                <button class="tab-btn active" onclick="showTab('login')">Login</button>
+                <button class="tab-btn" onclick="showTab('register')">Registrar</button>
+            </div>
+            <form id="loginForm" class="form active">
+                <input type="text" id="loginUsername" placeholder="Usuário" required>
+                <input type="password" id="loginPassword" placeholder="Senha" required>
+                <button type="submit">Entrar</button>
+                <div id="loginError" class="error"></div>
+            </form>
+
+            <form id="registerForm" class="form">
+                <input type="text" id="regUsername" placeholder="Usuário" required>
+                <input type="email" id="regEmail" placeholder="Email" required>
+                <input type="password" id="regPassword" placeholder="Senha" required>
+                <input type="password" id="regPassword2" placeholder="Confirmar Senha" required>
+                <button type="submit">Registrar</button>
+                <div id="registerError" class="error"></div>
+            </form>
+        </div>
+    </div>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="/static/js/api.js"></script>
+    <script>
+        function showTab(tab) {
+            document.querySelectorAll('.form').forEach(form => form.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+            if (tab === 'login') {
+                document.getElementById('loginForm').classList.add('active');
+            } else {
+                document.getElementById('registerForm').classList.add('active');
+            }
+            event.target.classList.add('active');
+        }
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+
+            const result = await login(username, password);
+            if (result.token) {
+                window.location.href = '/feed/';
+            } else {
+                document.getElementById('loginError').textContent = result.error || 'Erro no login';
+            }
+        });
+
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('regUsername').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            const password2 = document.getElementById('regPassword2').value;
+
+            const result = await register(username, email, password, password2);
+            if (result.token) {
+                window.location.href = '/feed/';
+            } else {
+                let errorMsg = 'Erro no registro';
+                if (result.password) errorMsg = result.password[0];
+                else if (result.username) errorMsg = result.username[0];
+                else if (result.email) errorMsg = result.email[0];
+                document.getElementById('registerError').textContent = errorMsg;
+            }
+        });
+    </script>
+</body>
+</html>

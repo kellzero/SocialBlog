@@ -6,6 +6,9 @@ from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from accounts.models import Profile, Follow
+from rest_framework.views import APIView
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 from accounts.serializers.user_serializer import (
     UserSerializer, RegisterSerializer, ProfileSerializer, FollowSerializer
 )
@@ -57,6 +60,7 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
         return Response(serializer.data)
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     permission_classes = [AllowAny]
@@ -73,7 +77,8 @@ class RegisterView(generics.CreateAPIView):
         }, status=status.HTTP_201_CREATED)
 
 
-class LoginView(generics.GenericAPIView):
+@method_decorator(csrf_exempt, name='dispatch')
+class LoginView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
@@ -90,14 +95,12 @@ class LoginView(generics.GenericAPIView):
             })
         return Response({'error': 'Credenciais inválidas'}, status=status.HTTP_401_UNAUTHORIZED)
 
-
 class ProfileViewSet(viewsets.ModelViewSet):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        # Usuários só podem ver/modificar seu próprio perfil
         return Profile.objects.filter(user=self.request.user)
 
     @action(detail=False, methods=['put', 'patch'], url_path='me')
@@ -105,12 +108,9 @@ class ProfileViewSet(viewsets.ModelViewSet):
         profile = request.user.profile
         user = request.user
 
-        # Atualizar perfil
         profile_serializer = self.get_serializer(profile, data=request.data, partial=True)
         profile_serializer.is_valid(raise_exception=True)
         profile_serializer.save()
-
-        # Atualizar dados do usuário
         if 'first_name' in request.data:
             user.first_name = request.data['first_name']
         if 'last_name' in request.data:

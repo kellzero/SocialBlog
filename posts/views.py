@@ -1,15 +1,12 @@
 from rest_framework import viewsets, generics, status
 from rest_framework.decorators import action
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
-from django.contrib.auth.models import User
-from django.shortcuts import get_object_or_404
 from posts.models import Post, Like, Comment
 from posts.serializers.post_serializer import (
     PostSerializer, PostCreateSerializer, LikeSerializer, CommentSerializer
 )
-from accounts.models import Follow
-
 
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
@@ -30,11 +27,8 @@ class PostViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
     def feed(self, request):
-        # Pega os usuários que o request.user segue
         following_users = request.user.following.values_list('following', flat=True)
-        # Busca posts desses usuários
         posts = Post.objects.filter(author__in=following_users)
-        # Ordena por data
         posts = posts.order_by('-created_at')
 
         page = self.paginate_queryset(posts)
@@ -80,3 +74,9 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+    def perform_destroy(self, instance):
+        if instance.user == self.request.user or instance.post.author == self.request.user:
+            instance.delete()
+        else:
+            raise PermissionDenied("Você não pode apagar este comentário.")
