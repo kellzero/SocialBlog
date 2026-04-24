@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SocialBlog - Feed</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+        <div class="navbar">
+            <h2>📚 SocialBlog Feed</h2>
+            <button class="logout-btn" onclick="logout()">Sair</button>
+        </div>
+
+        <div class="feed-layout">
+        <div class="sidebar sidebar-left">
+            <h3>👥 Seguindo</h3>
+            <ul id="seguindo-list" class="user-list">
+                <li>Carregando...</li>
+            </ul>
+        </div>
+
+        <div class="main-feed">
+            <div class="new-post">
+                <textarea id="postContent" rows="3" placeholder="O que você está pensando?"></textarea>
+                <button onclick="criarPost()">Publicar</button>
+            </div>
+            <div id="feed"></div>
+        </div>
+
+        <div class="sidebar sidebar-right">
+            <h3>✨ Sugestões para seguir</h3>
+            <ul id="sugestoes-list" class="user-list">
+                <li>Carregando...</li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="/static/js/api.js"></script>
+
+    <script src="/static/js/api.js"></script>
+
+
+    <script src="/static/js/api.js"></script>
+    <script>
+        let currentUserId = null;
+
+        async function loadCurrentUser() {
+            const token = localStorage.getItem('token');
+            const resp = await fetch('/api/accounts/users/me/', {
+                headers: { 'Authorization': `Token ${token}` }
+            });
+            const user = await resp.json();
+            currentUserId = user.id;
+        }
+
+        async function loadFollowing() {
+            if (!currentUserId) return;
+            const token = localStorage.getItem('token');
+            const resp = await fetch(`/api/accounts/users/${currentUserId}/following/`, {
+                headers: { 'Authorization': `Token ${token}` }
+            });
+            const data = await resp.json();
+            const lista = document.getElementById('seguindo-list');
+            if (data.length === 0) {
+                lista.innerHTML = '<li>Você não segue ninguém</li>';
+                return;
+            }
+            lista.innerHTML = data.map(follow => `
+                <li>
+                    <span>${follow.following_username}</span>
+                    <button class="unfollow" onclick="unfollowUser(${follow.following})">Deixar de seguir</button>
+                </li>
+            `).join('');
+        }
+
+        async function loadSuggestions() {
+            const token = localStorage.getItem('token');
+            const resp = await fetch('/api/accounts/users/', {
+                headers: { 'Authorization': `Token ${token}` }
+            });
+            const data = await resp.json();
+            const users = data.results;
+
+            const followingResp = await fetch(`/api/accounts/users/${currentUserId}/following/`, {
+                headers: { 'Authorization': `Token ${token}` }
+            });
+            const followingData = await followingResp.json();
+            const followingIds = followingData.map(f => f.following);
+
+            const suggestions = users.filter(u => u.id !== currentUserId && !followingIds.includes(u.id));
+
+            const lista = document.getElementById('sugestoes-list');
+            if (suggestions.length === 0) {
+                lista.innerHTML = '<li>Nenhuma sugestão no momento</li>';
+                return;
+            }
+            lista.innerHTML = suggestions.map(user => `
+                <li>
+                    <span>${user.username}</span>
+                    <button onclick="followUser(${user.id})">Seguir</button>
+                </li>
+            `).join('');
+        }
+
+        async function followUser(id) {
+            const token = localStorage.getItem('token');
+            await fetch(`/api/accounts/users/${id}/follow/`, {
+                method: 'POST',
+                headers: { 'Authorization': `Token ${token}` }
+            });
+            loadFollowing();
+            loadSuggestions();
+            carregarFeed();
+        }
+
+        async function unfollowUser(id) {
+            const token = localStorage.getItem('token');
+            await fetch(`/api/accounts/users/${id}/unfollow/`, {
+                method: 'POST',
+                headers: { 'Authorization': `Token ${token}` }
+            });
+            loadFollowing();
+            loadSuggestions();
+            carregarFeed();
+        }
+
+        async function carregarFeed() {
+            if (!isAuthenticated()) {
+                window.location.href = '/login/';
+                return;
+            }
+
+            const feed = await getFeed();
+            const feedDiv = document.getElementById('feed');
+
+            if (feed.results.length === 0) {
+                feedDiv.innerHTML = '<p style="text-align:center">Nenhum post no feed. Siga alguém para ver posts!</p>';
+                return;
+            }
+
+            feedDiv.innerHTML = feed.results.map(post => `
+                <div class="post" data-post-id="${post.id}">
+                    <div class="post-header">
+                        <span>👤 ${post.author.username}</span>
+                        <span>📅 ${new Date(post.created_at).toLocaleDateString()}</span>
+                    </div>
+                    <div class="post-content">${post.content}</div>
+                    <div class="post-actions">
+                        <button class="like-btn ${post.is_liked ? 'liked' : ''}" onclick="curtirPost(${post.id}, this)">
+                            ❤️ ${post.likes_count}
+                        </button>
+                        <button class="comment-btn" onclick="mostrarComentarios(${post.id}, this)">
+                            💬 ${post.comments_count}
+                        </button>
+                    </div>
+                    <div id="comments-${post.id}" class="comments" style="display:none">
+                        ${post.comments.map(c => `
+                            <div class="comment" data-comment-id="${c.id}" data-user-id="${c.user.id}">
+                                <strong>${c.user.username}:</strong> ${c.content}
+                                ${(c.user.id === currentUserId || post.author.id === currentUserId) ?
+                                    `<button class="delete-comment" onclick="deleteComment(${post.id}, ${c.id})">🗑️</button>` : ''}
+                            </div>
+                        `).join('')}
+                        <input type="text" id="comment-input-${post.id}" placeholder="Escreva um comentário...">
+                        <button onclick="comentarPost(${post.id})">Comentar</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function criarPost() {
+            const content = document.getElementById('postContent').value;
+            if (!content.trim()) {
+                alert('Digite algo para publicar!');
+                return;
+            }
+            await createPost(content);
+            document.getElementById('postContent').value = '';
+            carregarFeed();
+        }
+
+        async function curtirPost(postId, btn) {
+            const liked = btn.classList.contains('liked');
+            if (liked) {
+                await unlikePost(postId);
+            } else {
+                await likePost(postId);
+            }
+            carregarFeed();
+        }
+
+        async function comentarPost(postId) {
+            const input = document.getElementById(`comment-input-${postId}`);
+            const content = input.value;
+            if (!content.trim()) return;
+            await addComment(postId, content);
+            input.value = '';
+            carregarFeed();
+        }
+
+        async function deleteComment(postId, commentId) {
+            const token = localStorage.getItem('token');
+            await fetch(`/api/posts/comments/${commentId}/`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Token ${token}` }
+            });
+            carregarFeed();
+        }
+
+        function mostrarComentarios(postId, btn) {
+            const commentsDiv = document.getElementById(`comments-${postId}`);
+            if (commentsDiv.style.display === 'none') {
+                commentsDiv.style.display = 'block';
+            } else {
+                commentsDiv.style.display = 'none';
+            }
+        }
+
+        (async function init() {
+            await loadCurrentUser();
+            await loadFollowing();
+            await loadSuggestions();
+            await carregarFeed();
+        })();
+    </script>
+</body>
+</html>
