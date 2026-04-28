@@ -208,4 +208,3 @@ __marimo__/
 staticfiles/
 media/
 *.pyc
-db.sqlite3
