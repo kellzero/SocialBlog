@@ -28,7 +28,8 @@ class PostViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
     def feed(self, request):
         following_users = request.user.following.values_list('following', flat=True)
-        posts = Post.objects.filter(author__in=following_users)
+        users_to_include = list(following_users) + [request.user.id]
+        posts = Post.objects.filter(author__id__in=users_to_include)
         posts = posts.order_by('-created_at')
 
         page = self.paginate_queryset(posts)
