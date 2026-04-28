@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Perfil - SocialBlog</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        .avatar-preview {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 10px auto;
+            display: block;
+            border: 2px solid #667eea;
+        }
+        .file-input {
+            margin: 10px 0;
+        }
+        .profile-form input, .profile-form textarea {
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" style="max-width: 600px;">
+        <div class="card">
+            <h1>👤 Meu Perfil</h1>
+            <form id="perfilForm" enctype="multipart/form-data">
+                <img id="avatarPreview" class="avatar-preview" src="/static/default-avatar.png" alt="Avatar">
+                <div class="file-input">
+                    <label>Foto de perfil:</label>
+                    <input type="file" id="avatar" accept="image/*">
+                </div>
+                <label>Nome:</label>
+                <input type="text" id="first_name" placeholder="Primeiro nome">
+                <label>Sobrenome:</label>
+                <input type="text" id="last_name" placeholder="Sobrenome">
+                <label>Bio:</label>
+                <textarea id="bio" rows="3" placeholder="Sobre você..."></textarea>
+                <label>Nova senha (opcional):</label>
+                <input type="password" id="password" placeholder="Nova senha">
+                <button type="submit">Salvar alterações</button>
+                <div id="msg"></div>
+            </form>
+            <p><a href="/feed/">Voltar ao Feed</a></p>
+        </div>
+    </div>
+    <script src="/static/js/api.js"></script>
+    <script>
+        async function carregarPerfil() {
+            const token = localStorage.getItem('token');
+            const resp = await fetch('/api/accounts/users/me/', {
+                headers: { 'Authorization': `Token ${token}` }
+            });
+            const user = await resp.json();
+            document.getElementById('first_name').value = user.first_name || '';
+            document.getElementById('last_name').value = user.last_name || '';
+            document.getElementById('bio').value = user.profile?.bio || '';
+            if (user.profile?.avatar) {
+                document.getElementById('avatarPreview').src = user.profile.avatar;
+            }
+        }
+
+        document.getElementById('perfilForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const token = localStorage.getItem('token');
+            const formData = new FormData();
+            formData.append('first_name', document.getElementById('first_name').value);
+            formData.append('last_name', document.getElementById('last_name').value);
+            formData.append('bio', document.getElementById('bio').value);
+            const password = document.getElementById('password').value;
+            if (password) formData.append('password', password);
+            const avatarFile = document.getElementById('avatar').files[0];
+            if (avatarFile) formData.append('avatar', avatarFile);
+
+            const resp = await fetch('/api/accounts/profiles/me/', {
+                method: 'PATCH',
+                headers: { 'Authorization': `Token ${token}` },
+                body: formData
+            });
+            if (resp.ok) {
+                document.getElementById('msg').innerText = 'Perfil atualizado!';
+                setTimeout(() => window.location.href = '/feed/', 1500);
+            } else {
+                const err = await resp.json();
+                document.getElementById('msg').innerText = 'Erro: ' + JSON.stringify(err);
+            }
+        });
+
+        // Preview da imagem antes de enviar
+        document.getElementById('avatar').addEventListener('change', function(e) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                document.getElementById('avatarPreview').src = event.target.result;
+            }
+            reader.readAsDataURL(e.target.files[0]);
+        });
+
+        carregarPerfil();
+    </script>
+</body>
+</html>

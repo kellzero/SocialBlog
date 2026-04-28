@@ -30,7 +30,7 @@ function logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     authToken = null;
-    window.location.href = 'index.html';
+    window.location.href = '/login/';
 }
 
 async function getFeed() {
