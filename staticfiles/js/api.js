@@ -1,11 +1,7 @@
-// Configuração
-const API_URL = '/api';  // Local
-// const API_URL = 'https://kellzero.pythonanywhere.com/api';  // Produção
 
-// Armazenar token
+const API_URL = '/api';
 let authToken = localStorage.getItem('token');
 
-// Funções de autenticação
 async function register(username, email, password, password2) {
     const response = await fetch(`${API_URL}/accounts/register/`, {
         method: 'POST',
@@ -34,10 +30,9 @@ function logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     authToken = null;
-    window.location.href = 'index.html';
+    window.location.href = '/login/';
 }
 
-// Funções de posts
 async function getFeed() {
     const response = await fetch(`${API_URL}/posts/posts/feed/`, {
         headers: { 'Authorization': `Token ${authToken}` }
@@ -85,7 +80,6 @@ async function addComment(postId, content) {
     return await response.json();
 }
 
-// Funções de usuários
 async function getUsers() {
     const response = await fetch(`${API_URL}/accounts/users/`, {
         headers: { 'Authorization': `Token ${authToken}` }

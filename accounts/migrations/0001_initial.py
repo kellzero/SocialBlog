@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
             name='Profile',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('avatar', models.ImageField(blank=True, default='avatars/default.png', null=True, upload_to='avatars/')),
+                ('avatar', models.ImageField(blank=True, default='avatars/default-avatar.jpg', null=True, upload_to='avatars/')),
                 ('bio', models.TextField(blank=True, max_length=500)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
