@@ -94,3 +94,8 @@ function isAuthenticated() {
 function getUser() {
     return JSON.parse(localStorage.getItem('user') || '{}');
 }
+let avatarUrl = user.profile?.avatar;
+if (!avatarUrl || avatarUrl.includes('default')) {
+    avatarUrl = '/static/default-avatar.jpg';
+}
+document.getElementById('navAvatar').src = avatarUrl;
